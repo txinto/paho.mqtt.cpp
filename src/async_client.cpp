@@ -51,6 +51,7 @@ async_client::async_client(const string& serverURI, const string& clientId,
 				: serverURI_(serverURI), clientId_(clientId),
 					mqttVersion_(MQTTVERSION_DEFAULT), userCallback_(nullptr)
 {
+	std::cout << "constructor" << std::endl;
 	create_options opts(MQTTVERSION_DEFAULT, maxBufferedMessages);
 
 	int rc = MQTTAsync_createWithOptions(&cli_, serverURI.c_str(), clientId.c_str(),
@@ -76,6 +77,7 @@ async_client::async_client(const string& serverURI, const string& clientId,
 				: serverURI_(serverURI), clientId_(clientId),
 					mqttVersion_(opts.opts_.MQTTVersion), userCallback_(nullptr)
 {
+		std::cout << "constructor2" << std::endl;
 	int rc = MQTTAsync_createWithOptions(&cli_, serverURI.c_str(), clientId.c_str(),
 										 MQTTCLIENT_PERSISTENCE_DEFAULT,
 										 const_cast<char*>(persistDir.c_str()),
@@ -90,6 +92,7 @@ async_client::async_client(const string& serverURI, const string& clientId,
 				: serverURI_(serverURI), clientId_(clientId),
 					mqttVersion_(opts.opts_.MQTTVersion), userCallback_(nullptr)
 {
+		std::cout << "constructor3" << std::endl;
 	int rc = MQTTASYNC_SUCCESS;
 
 	if (!persistence) {
@@ -175,8 +178,10 @@ void async_client::on_connection_lost(void *context, char *cause)
 			connLostHandler(cause_str);
 
 		consumer_queue_type& que = cli->que_;
-		if (que)
+		if (que){
+			std::cout << "put 1" << std::endl;
 			que->put(const_message_ptr{});
+		}
 	}
 }
 
@@ -202,6 +207,7 @@ void async_client::on_disconnected(void* context, MQTTProperties* cprops,
 int async_client::on_message_arrived(void* context, char* topicName, int topicLen,
 									 MQTTAsync_message* msg)
 {
+	std::cout << "Message arrived" << topicName << std::endl;
 	if (context) {
 		async_client* cli = static_cast<async_client*>(context);
 		callback* cb = cli->userCallback_;
@@ -220,8 +226,11 @@ int async_client::on_message_arrived(void* context, char* topicName, int topicLe
 			if (cb)
 				cb->message_arrived(m);
 
-			if (que)
+			if (que){
+				std::cout << "put 2" << std::endl;
 				que->put(m);
+			}
+				
 		}
 	}
 
@@ -665,6 +674,7 @@ token_ptr async_client::subscribe(const string& topicFilter, int qos,
 								  const subscribe_options& opts /*=subscribe_options()*/,
 								  const properties& props /*=properties()*/)
 {
+	std::cout << "Suscribe " << topicFilter << std::endl;
 	auto tok = token::create(token::Type::SUBSCRIBE, *this, topicFilter);
 	tok->set_num_expected(0);	// Indicates non-array response for single val
 	add_token(tok);
@@ -690,6 +700,7 @@ token_ptr async_client::subscribe(const string& topicFilter, int qos,
 								  const subscribe_options& opts /*=subscribe_options()*/,
 								  const properties& props /*=properties()*/)
 {
+	std::cout << "Suscribe2 " << topicFilter << std::endl;
 	auto tok = token::create(token::Type::SUBSCRIBE, *this, topicFilter,
 							 userContext, cb);
 	tok->set_num_expected(0);
@@ -717,6 +728,7 @@ token_ptr async_client::subscribe(const_string_collection_ptr topicFilters,
 									/*=std::vector<subscribe_options>()*/,
 								  const properties& props /*=properties()*/)
 {
+	std::cout << "Suscribe3 " << topicFilters << std::endl;
 	size_t n = topicFilters->size();
 
 	if (n != qos.size())
@@ -750,6 +762,7 @@ token_ptr async_client::subscribe(const_string_collection_ptr topicFilters,
 									/*=std::vector<subscribe_options>()*/,
 								  const properties& props /*=properties()*/)
 {
+	std::cout << "Suscribe4 " << topicFilters << std::endl;
 	size_t n = topicFilters->size();
 
 	if (n != qos.size())
@@ -881,6 +894,7 @@ token_ptr async_client::unsubscribe(const string& topicFilter,
 void async_client::start_consuming()
 {
 	// Make sure callbacks don't happen while we update the que, etc
+	std::cout << "Start consuming " << std::endl;
 	disable_callbacks();
 
 	// TODO: Should we replace user callback?

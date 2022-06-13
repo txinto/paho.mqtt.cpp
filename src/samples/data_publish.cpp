@@ -203,6 +203,8 @@ public:
 	void put(const string& key, const std::vector<mqtt::string_view>& bufs) override {
 		auto path = path_name(key);
 
+		std::cout << "put 4" << std::endl;
+
 		ofstream os(path, ios_base::binary);
 		if (!os)
 			throw mqtt::persistence_exception();

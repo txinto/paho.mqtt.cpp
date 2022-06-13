@@ -69,6 +69,8 @@ int iclient_persistence::persistence_put(void* handle, char* key, int bufcount,
 			std::vector<string_view> vec;
 			for (int i=0; i<bufcount; ++i)
 				vec.push_back(string_view(buffers[i], buflens[i]));
+
+			std::cout << "put 3" << std::endl;
 			static_cast<iclient_persistence*>(handle)->put(key, vec);
 			return MQTTASYNC_SUCCESS;
 		}
