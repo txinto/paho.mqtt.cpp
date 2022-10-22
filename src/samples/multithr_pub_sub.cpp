@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 				break;
 			}
 
-			cout << "hola" << msg->get_topic() << ": " << msg->to_string() << endl;
+			cout << msg->get_topic() << ": " << msg->to_string() << endl;
 			counter->incr();
 		}
 
