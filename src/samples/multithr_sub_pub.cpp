@@ -61,7 +61,7 @@ using namespace std;
 using namespace std::chrono;
 
 const std::string DFLT_SERVER_ADDRESS("tcp://test.mosquitto.org:1883");
-const std::string CLIENT_ID("asiclient");
+const std::string CLIENT_ID("asicontroller");
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -127,13 +127,17 @@ public:
 void publisher_func(mqtt::async_client_ptr cli, multithr_counter::ptr_t counter)
 {
 	while (true) {
-		cout << "publishing asi_req" << endl;
+		/*cout << "publishing asi_resp" << endl;
 		size_t n = counter->get_count();
-		if (counter->closed()) break;
+		cout << "publishing asi_resp2" << endl;
 
+		if (counter->closed()) break;
+		cout << "publishing asi_resp3" << endl;
+*/
+		size_t n = 0x0255432342;
 		string payload = std::to_string(n);
-		cli->publish("asi_req", payload)->wait();
-		cout << "publishing asi_req" << endl;
+		cli->publish("asi_resp", payload)->wait();
+		cout << "publishing asi_resp" << endl;
 	}
 }
 
@@ -155,8 +159,8 @@ int main(int argc, char* argv[])
 		.automatic_reconnect(seconds(2), seconds(30))
 		.finalize();
 
-	auto TOPICS = mqtt::string_collection::create({ "asi_resp" });
-	const vector<int> QOS { 0};
+	auto TOPICS = mqtt::string_collection::create({ "asi_req" });
+	const vector<int> QOS { 0 };
 
 	try {
 		// Start consuming _before_ connecting, because we could get a flood
@@ -169,18 +173,17 @@ int main(int argc, char* argv[])
 		cout << "OK\n" << endl;
 
 		// Subscribe if this is a new session with the server
-		if (!rsp.is_session_present()){
-			cli->subscribe(TOPICS, QOS);
+		//if (!rsp.is_session_present()){
 			cout << "subscription started " << endl;
-		}
-		cli->subscribe(TOPICS, QOS);
+			cli->subscribe(TOPICS, QOS);
+		//}
+
 		// Start the publisher thread
 
 		std::thread publisher(publisher_func, cli, counter);
 		cout << "publisher started " << endl;
 
 		// Consume messages in this thread
-
 		while (true) {
 			auto msg = cli->consume_message();
 
@@ -191,9 +194,11 @@ int main(int argc, char* argv[])
 					msg->to_string() == "exit") {
 				cout << "Exit command received" << endl;
 				break;
+			} else {
+				cout << "topic: " << msg->get_topic() << " = " << msg->to_string() << endl;
 			}
 
-			cout << "hola" << msg->get_topic() << ": " << msg->to_string() << endl;
+			cout << "hola2" << msg->get_topic() << ": " << msg->to_string() << endl;
 			counter->incr();
 		}
 

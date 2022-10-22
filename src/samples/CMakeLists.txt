@@ -46,6 +46,7 @@ add_executable(rpc_math_cli rpc_math_cli.cpp)
 add_executable(rpc_math_srvr rpc_math_srvr.cpp)
 add_executable(mqttpp_chat mqttpp_chat.cpp)
 add_executable(multithr_pub_sub multithr_pub_sub.cpp)
+add_executable(multithr_sub_pub multithr_sub_pub.cpp)
 add_executable(ws_publish ws_publish.cpp)
 add_executable(pub_speed_test pub_speed_test.cpp)
 
@@ -64,6 +65,7 @@ target_link_libraries(rpc_math_cli ${PAHO_CPP_LIB})
 target_link_libraries(rpc_math_srvr ${PAHO_CPP_LIB})
 target_link_libraries(mqttpp_chat ${PAHO_CPP_LIB})
 target_link_libraries(multithr_pub_sub ${PAHO_CPP_LIB})
+target_link_libraries(multithr_sub_pub ${PAHO_CPP_LIB})
 target_link_libraries(ws_publish ${PAHO_CPP_LIB})
 target_link_libraries(pub_speed_test ${PAHO_CPP_LIB})
 
@@ -82,6 +84,7 @@ set(INSTALL_TARGETS
 	mqttpp_chat
   topic_publish
   multithr_pub_sub
+  multithr_sub_pub
   ws_publish
 	pub_speed_test
 )
